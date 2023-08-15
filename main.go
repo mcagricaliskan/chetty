@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
+	"the-game-backend/app/controllers/auth"
 
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -14,65 +14,55 @@ type User struct {
 
 var users = make(map[string]string) // username -> hashed password
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(bytes), err
-}
+// func Register(c *fiber.Ctx) error {
+// 	user := new(User)
 
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
+// 	if err := c.BodyParser(user); err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"error": "Failed to parse request",
+// 		})
+// 	}
 
-func Register(c *fiber.Ctx) error {
-	user := new(User)
+// 	hashedPassword, err := HashPassword(user.Password)
+// 	if err != nil {
+// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 			"error": "Failed to hash password",
+// 		})
+// 	}
 
-	if err := c.BodyParser(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Failed to parse request",
-		})
-	}
+// 	users[user.Username] = hashedPassword
 
-	hashedPassword, err := HashPassword(user.Password)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to hash password",
-		})
-	}
+// 	return c.JSON(fiber.Map{
+// 		"message": "Registered successfully",
+// 	})
+// }
 
-	users[user.Username] = hashedPassword
+// func Login(c *fiber.Ctx) error {
+// 	user := new(User)
 
-	return c.JSON(fiber.Map{
-		"message": "Registered successfully",
-	})
-}
+// 	if err := c.BodyParser(user); err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"error": "Failed to parse request",
+// 		})
+// 	}
 
-func Login(c *fiber.Ctx) error {
-	user := new(User)
+// 	hashedPassword, exists := users[user.Username]
+// 	if !exists || !CheckPasswordHash(user.Password, hashedPassword) {
+// 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+// 			"error": "Invalid login credentials",
+// 		})
+// 	}
 
-	if err := c.BodyParser(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Failed to parse request",
-		})
-	}
-
-	hashedPassword, exists := users[user.Username]
-	if !exists || !CheckPasswordHash(user.Password, hashedPassword) {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Invalid login credentials",
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"message": "Logged in successfully",
-	})
-}
+// 	return c.JSON(fiber.Map{
+// 		"message": "Logged in successfully",
+// 	})
+// }
 
 func main() {
 	app := fiber.New()
 
-	app.Post("/register", Register)
-	app.Post("/login", Login)
+	app.Post("/register", auth.Register)
+	// app.Post("/login", auth.Login)
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":33333"))
 }

@@ -3,8 +3,8 @@
     "version": "2.2.11",
     "width": 10000,
     "height": 10000,
-    "scrollTop": -154,
-    "scrollLeft": -549,
+    "scrollTop": -198,
+    "scrollLeft": -596,
     "zoomLevel": 1,
     "show": {
       "tableComment": true,
@@ -162,7 +162,7 @@
             "id": "bf806c66-b50f-41f0-84f4-3e8026e79e56"
           },
           {
-            "name": "birthday",
+            "name": "birth_date",
             "comment": "",
             "dataType": "date",
             "default": "",
@@ -255,10 +255,10 @@
           }
         ],
         "ui": {
-          "active": false,
+          "active": true,
           "left": 634,
           "top": 393,
-          "zIndex": 216,
+          "zIndex": 16,
           "widthName": 60,
           "widthComment": 60
         },
@@ -320,7 +320,7 @@
           "active": false,
           "left": 1220,
           "top": 330,
-          "zIndex": 205,
+          "zIndex": 2,
           "widthName": 60,
           "widthComment": 60
         },
@@ -382,7 +382,7 @@
           "active": false,
           "left": 1218,
           "top": 461,
-          "zIndex": 204,
+          "zIndex": 1,
           "widthName": 110.39892578125,
           "widthComment": 60
         },
