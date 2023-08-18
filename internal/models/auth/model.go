@@ -1,6 +1,6 @@
 package auth
 
-type RegisterRequest struct {
+type RegisterModel struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Mail      string `json:"mail"`
@@ -8,7 +8,7 @@ type RegisterRequest struct {
 	BirthDate string `json:"birthDate"`
 }
 
-type LoginRequest struct {
+type LoginModel struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
