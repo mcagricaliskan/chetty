@@ -2,16 +2,19 @@ package auth
 
 import (
 	"log"
+	"os"
 	"the-game-backend/services/postgres"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type Authentication struct {
 	DB *postgres.Postgres
 }
 
-func (a Authentication) Router(app *fiber.App) {
+func (a Authentication) RegisterRouters(app *fiber.App) {
 	app.Post("/register", a.Regsiter)
 	app.Post("/login", a.Login)
 }
@@ -65,26 +68,35 @@ func (a Authentication) Regsiter(c *fiber.Ctx) error {
 
 func (a Authentication) Login(c *fiber.Ctx) error {
 
-	user := LoginReq{}
-	if err := c.BodyParser(&user); err != nil {
+	login := LoginReq{}
+	if err := c.BodyParser(&login); err != nil {
 		return c.Status(422).JSON(err)
 	}
 
+	user, err := GetUser(a.DB, c.Context(), login.Username)
+	if err != nil {
+		log.Println("auth -> Login -> GetUser -> Error while getting user, ", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
+	}
+
+	if !CheckPasswordHash(login.Password, user.Password) {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Unauthorized"})
+	}
+
 	// Create the Claims
-	// claims := jwt.MapClaims{
-	// 	"name":  "John Doe",
-	// 	"admin": true,
-	// 	"exp":   time.Now().Add(time.Hour * 72).Unix(),
-	// }
+	claims := jwt.MapClaims{
+		"id":  user.Id,
+		"exp": time.Now().Add(time.Hour * 72).Unix(),
+	}
 
-	// // Create token
-	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// // Generate encoded token and send it as response.
-	// t, err := token.SignedString([]byte("secret"))
-	// if err != nil {
-	// 	return c.SendStatus(fiber.StatusInternalServerError)
-	// }
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
 
-	return c.JSON(fiber.Map{"token": "ok"})
+	return c.JSON(fiber.Map{"token": t})
 }
