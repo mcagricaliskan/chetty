@@ -20,28 +20,37 @@ func (a Authentication) Regsiter(c *fiber.Ctx) error {
 
 	user := RegisterReq{}
 	if err := c.BodyParser(&user); err != nil {
-		return c.Status(422).JSON(err)
-	}
-
-	// i can move here to redis if user nubmer grows
-	_, err := IsUserExists(a.DB, c.Context(), user.Username)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"message": "Internal Server Error"})
-	}
-
-	hashedPassword, err := HashPassword(user.Password)
-	if err != nil {
 		// returns
 		// {
 		// 	"code": 422,
 		// 	"message": "Unprocessable Entity"
 		// }
-		return err
+		return c.Status(422).JSON(err)
 	}
 
-	log.Println(user, hashedPassword)
+	// i can move here to redis if user nubmer grows
+	isUserExists, err := IsUserExists(a.DB, c.Context(), user.Username)
+	if err != nil {
+		log.Println("auth -> Register -> IsUserExists -> Error while checking user exists, ", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
+	}
+	if isUserExists {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"message": "User Already Exists"})
+	}
 
-	return c.SendString("Register")
+	hashedPassword, err := HashPassword(user.Password)
+	if err != nil {
+		log.Println("auth -> Register -> HashPassword -> Error while hashing password, ", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
+	}
+
+	err = CreateUser(a.DB, c.Context(), &user, hashedPassword)
+	if err != nil {
+		log.Println("auth -> Register -> CreateUser -> Error while creating user, ", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
+	}
+
+	return c.SendStatus(fiber.StatusOK)
 }
 
 func (a Authentication) Login(c *fiber.Ctx) error {
