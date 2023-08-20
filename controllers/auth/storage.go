@@ -5,6 +5,7 @@ import (
 	"the-game-backend/services/postgres"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 func IsUserExists(db *postgres.Postgres, ctx context.Context, username string) (isUserExists bool, err error) {
@@ -33,4 +34,14 @@ func CreateUser(db *postgres.Postgres, ctx context.Context, user *RegisterReq, h
 		values ($1, $2, $3, $4, $5, $6, $7, now())`,
 		id.String(), user.Username, hashedPassword, user.EMail, user.BirthDate, genderId, characterGenderId)
 	return err
+}
+
+func GetUser(db *postgres.Postgres, ctx context.Context, username string) (isUserExists bool, user User, err error) {
+	err = db.Connection.QueryRow(ctx, `
+		select user_uuid, password from thegame.users where username = $1`, username).Scan(&user.Id, &user.Password)
+	if err == pgx.ErrNoRows {
+		return false, user, nil
+	}
+	isUserExists = true
+	return isUserExists, user, err
 }

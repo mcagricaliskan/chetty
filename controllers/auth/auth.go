@@ -73,10 +73,13 @@ func (a Authentication) Login(c *fiber.Ctx) error {
 		return c.Status(422).JSON(err)
 	}
 
-	user, err := GetUser(a.DB, c.Context(), login.Username)
+	isUserExists, user, err := GetUser(a.DB, c.Context(), login.Username)
 	if err != nil {
 		log.Println("auth -> Login -> GetUser -> Error while getting user, ", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
+	}
+	if !isUserExists {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Unauthorized"})
 	}
 
 	if !CheckPasswordHash(login.Password, user.Password) {
