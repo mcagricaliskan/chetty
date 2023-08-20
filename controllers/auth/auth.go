@@ -49,6 +49,7 @@ func (a Authentication) Regsiter(c *fiber.Ctx) error {
 
 	genderId, err := getGenderId(user.Gender)
 	if err != nil {
+		log.Println("auth -> Register -> getGenderId -> Error while getting gender id, ", err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
 	}
 	characterGenderId, err := getCharacterGenderId(user.CharacterGender)
@@ -98,6 +99,7 @@ func (a Authentication) Login(c *fiber.Ctx) error {
 	// Generate encoded token and send it as response.
 	t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
+		log.Println("auth -> Login -> SignedString -> Error while signing token, ", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
