@@ -3,16 +3,21 @@ package main
 import (
 	"log"
 	"the-game-backend/controllers/auth"
+	"the-game-backend/services/postgres"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
+
+	db, err := postgres.Connect()
+	if err != nil {
+		log.Fatal("Database Connection Can't Estabilished, Error:", err)
+	}
+
 	app := fiber.New()
 
-	//connection := pgx.ConnConfig{}
-
-	auth := auth.Authentication{Repository: auth.AuthenticationRepository{Connection: connection}}
+	auth := auth.Authentication{DB: db}
 	auth.Router(app)
 
 	log.Fatal(app.Listen(":33333"))

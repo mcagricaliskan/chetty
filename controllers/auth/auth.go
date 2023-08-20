@@ -2,7 +2,7 @@ package auth
 
 import (
 	"log"
-	"the-game-backend/internal/models/auth"
+	"the-game-backend/services/postgres"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,7 +10,7 @@ import (
 func hashedPassword()
 
 type Authentication struct {
-	Repository Repository
+	DB *postgres.Postgres
 }
 
 func (a Authentication) Router(app *fiber.App) {
@@ -20,13 +20,13 @@ func (a Authentication) Router(app *fiber.App) {
 
 func (a Authentication) Regsiter(c *fiber.Ctx) error {
 
-	user := auth.RegisterModel{}
+	user := RegisterReq{}
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(422).JSON(err)
 	}
 
 	// i can move here to redis if user nubmer grows
-	_, err := a.Repository.IsUserExists(c.Context(), user.Username)
+	_, err := IsUserExists(a.DB, c.Context(), user.Username)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"message": "Internal Server Error"})
 	}
@@ -47,12 +47,10 @@ func (a Authentication) Regsiter(c *fiber.Ctx) error {
 }
 
 func (a Authentication) Login(c *fiber.Ctx) error {
-	user := c.FormValue("user")
-	pass := c.FormValue("pass")
 
-	// Throws Unauthorized error
-	if user != "john" || pass != "doe" {
-		return c.SendStatus(fiber.StatusUnauthorized)
+	user := LoginReq{}
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(422).JSON(err)
 	}
 
 	// Create the Claims
