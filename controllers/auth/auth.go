@@ -44,7 +44,17 @@ func (a Authentication) Regsiter(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
 	}
 
-	err = CreateUser(a.DB, c.Context(), &user, hashedPassword)
+	genderId, err := getGenderId(user.Gender)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
+	}
+	characterGenderId, err := getCharacterGenderId(user.CharacterGender)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
+	}
+	log.Println(genderId, characterGenderId)
+
+	err = CreateUser(a.DB, c.Context(), &user, hashedPassword, genderId, characterGenderId)
 	if err != nil {
 		log.Println("auth -> Register -> CreateUser -> Error while creating user, ", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
