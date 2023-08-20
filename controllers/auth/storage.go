@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	"the-game-backend/services/postgres"
+
+	"github.com/google/uuid"
 )
 
 func IsUserExists(db *postgres.Postgres, ctx context.Context, username string) (isUserExists bool, err error) {
@@ -23,7 +25,12 @@ func GetUserPassword(db *postgres.Postgres, ctx context.Context, username string
 
 }
 
-func CreateUser(db *postgres.Postgres, ctx context.Context, user *RegisterReq, hashedPassword string) error {
-	_, err := db.Connection.Exec(ctx, `insert into thegame.users (username, password) values ($1, $2)`, user.Username, hashedPassword)
+func CreateUser(db *postgres.Postgres, ctx context.Context, user *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error {
+	id := uuid.New()
+	_, err := db.Connection.Exec(ctx, `
+		insert into thegame.users 
+		(user_uuid, username, password, email, birth_date, gender_id, character_gender_id, created_at) 
+		values ($1, $2, $3, $4, $5, $6, $7, now())`,
+		id.String(), user.Username, hashedPassword, user.EMail, user.BirthDate, genderId, characterGenderId)
 	return err
 }
