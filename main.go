@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"os"
-	"the-game-backend/controllers/auth"
-	"the-game-backend/services/postgres"
+	"the-game-backend/modules/auth"
+	"the-game-backend/storage/postgres"
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
@@ -17,7 +17,7 @@ func main() {
 		godotenv.Load()
 	}
 
-	db, err := postgres.Connect()
+	database, err := postgres.Connect()
 	if err != nil {
 		log.Fatal("Database Connection Can't Estabilished, Error:", err)
 	} else {
@@ -26,8 +26,7 @@ func main() {
 
 	app := fiber.New()
 
-	auth := auth.Authentication{DB: db}
-	auth.RegisterRouters(app)
+	auth.RegisterRouters(app, database)
 
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{Key: []byte(os.Getenv("JWT_SECRET"))},
