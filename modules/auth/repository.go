@@ -11,7 +11,7 @@ import (
 type AuthRepository interface {
 	IsUserExists(ctx context.Context, username string) (isUserExists bool, err error)
 	GetUserPassword(ctx context.Context, username string) (isUserExists bool, password string, err error)
-	CreateUser(ctx context.Context, user *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error
+	CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error
 	GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error)
 }
 
@@ -37,13 +37,13 @@ func (r *AuthRepo) GetUserPassword(ctx context.Context, username string) (isUser
 
 }
 
-func (r *AuthRepo) CreateUser(ctx context.Context, user *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error {
+func (r *AuthRepo) CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error {
 	id := uuid.New()
 	_, err := r.database.Connection.Exec(ctx, `
 		insert into thegame.users 
 		(user_uuid, username, password, email, birth_date, gender_id, character_gender_id, created_at) 
 		values ($1, $2, $3, $4, $5, $6, $7, now())`,
-		id.String(), user.Username, hashedPassword, user.EMail, user.BirthDate, genderId, characterGenderId)
+		id.String(), RegisterReq.Username, hashedPassword, RegisterReq.EMail, RegisterReq.BirthDate, genderId, characterGenderId)
 	return err
 }
 

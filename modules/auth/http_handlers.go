@@ -29,39 +29,6 @@ func (a *Authentication) Regsiter(c *fiber.Ctx) error {
 		return c.Status(422).JSON(fiber.Map{"message": "Unprocessable Entity"})
 	}
 
-	// i can move here to redis if user nubmer grows
-	isUserExists, err := a.repository.IsUserExists(c.Context(), user.Username)
-	if err != nil {
-		log.Println("auth -> Register -> IsUserExists -> Error while checking user exists, ", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
-	}
-	if isUserExists {
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"message": "User Already Exists"})
-	}
-
-	hashedPassword, err := HashPassword(user.Password)
-	if err != nil {
-		log.Println("auth -> Register -> HashPassword -> Error while hashing password, ", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
-	}
-
-	genderId, err := getGenderId(user.Gender)
-	if err != nil {
-		log.Println("auth -> Register -> getGenderId -> Error while getting gender id, ", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
-	}
-	characterGenderId, err := getCharacterGenderId(user.CharacterGender)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Bad Request"})
-	}
-	log.Println(genderId, characterGenderId)
-
-	err = a.repository.CreateUser(c.Context(), &user, hashedPassword, genderId, characterGenderId)
-	if err != nil {
-		log.Println("auth -> Register -> CreateUser -> Error while creating user, ", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Internal Server Error"})
-	}
-
 	return c.SendStatus(fiber.StatusOK)
 }
 
