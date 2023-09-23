@@ -29,6 +29,20 @@ func (a *AuthenticationFiber) Regsiter(c *fiber.Ctx) error {
 		return c.Status(422).JSON(fiber.Map{"message": "Unprocessable Entity"})
 	}
 
+	err := a.service.register(c.Context(), &user)
+	if err != nil {
+		switch err {
+		case ErrInternalServer:
+			return c.SendStatus(fiber.StatusInternalServerError)
+		case ErrUserExists:
+			return c.SendStatus(fiber.StatusConflict)
+		case ErrBadRequest:
+			return c.SendStatus(fiber.StatusBadRequest)
+		default:
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+	}
+
 	return c.SendStatus(fiber.StatusOK)
 }
 
