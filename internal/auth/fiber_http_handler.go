@@ -18,11 +18,11 @@ func RegisterRouters(app *fiber.App, service AuthService) {
 		service: service,
 	}
 
-	app.Post("/register", a.Regsiter)
+	app.Post("/register", a.Register)
 	app.Post("/login", a.Login)
 }
 
-func (a *AuthenticationFiber) Regsiter(c *fiber.Ctx) error {
+func (a *AuthenticationFiber) Register(c *fiber.Ctx) error {
 
 	user := RegisterReq{}
 	if err := c.BodyParser(&user); err != nil {
