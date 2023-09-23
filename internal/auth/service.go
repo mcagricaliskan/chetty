@@ -7,15 +7,21 @@ import (
 )
 
 type AuthService interface {
-	register(RegisterReq *RegisterReq) error
-	login(LoginReq *LoginReq) error
+	register(ctx context.Context, RegisterReq *RegisterReq) error
+	login(ctx context.Context, LoginReq *LoginReq) error
 }
 
-type AuthDomain struct {
-	repository AuthRepository
+type authService struct {
+	repository AuthDatabaseRepository
 }
 
-func (a AuthDomain) register(ctx context.Context, RegisterReq *RegisterReq) error {
+func NewAuthService(repository AuthDatabaseRepository) AuthService {
+	return &authService{
+		repository: repository,
+	}
+}
+
+func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) error {
 	// i can move here to redis if user nubmer grows
 	isUserExists, err := a.repository.IsUserExists(ctx, RegisterReq.Username)
 	if err != nil {
@@ -52,6 +58,7 @@ func (a AuthDomain) register(ctx context.Context, RegisterReq *RegisterReq) erro
 	return nil
 }
 
-func (a AuthDomain) login() {
+func (a authService) login(ctx context.Context, LoginReq *LoginReq) error {
 	// TODO
+	return nil
 }

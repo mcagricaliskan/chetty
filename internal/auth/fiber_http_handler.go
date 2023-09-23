@@ -11,12 +11,11 @@ import (
 )
 
 type Authentication struct {
-	repository AuthRepository
+	service AuthService
 }
 
 func RegisterRouters(app *fiber.App, database *postgres.Postgres) {
-	a := Authentication{
-		repository: &AuthRepo{database: database}}
+	a := Authentication{}
 
 	app.Post("/register", a.Regsiter)
 	app.Post("/login", a.Login)

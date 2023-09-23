@@ -8,18 +8,24 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type AuthRepository interface {
+type AuthDatabaseRepository interface {
 	IsUserExists(ctx context.Context, username string) (isUserExists bool, err error)
 	GetUserPassword(ctx context.Context, username string) (isUserExists bool, password string, err error)
 	CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error
 	GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error)
 }
 
-type AuthRepo struct {
+type authDatabaseRepository struct {
 	database *postgres.Postgres
 }
 
-func (r *AuthRepo) IsUserExists(ctx context.Context, username string) (isUserExists bool, err error) {
+func NewAuthDatabaseRepository(database *postgres.Postgres) AuthDatabaseRepository {
+	return &authDatabaseRepository{
+		database: database,
+	}
+}
+
+func (r *authDatabaseRepository) IsUserExists(ctx context.Context, username string) (isUserExists bool, err error) {
 	err = r.database.Connection.QueryRow(ctx, `select 
 			case 
 				when count(*) = 1 then true
@@ -30,14 +36,14 @@ func (r *AuthRepo) IsUserExists(ctx context.Context, username string) (isUserExi
 	return isUserExists, err
 }
 
-func (r *AuthRepo) GetUserPassword(ctx context.Context, username string) (isUserExists bool, password string, err error) {
+func (r *authDatabaseRepository) GetUserPassword(ctx context.Context, username string) (isUserExists bool, password string, err error) {
 	err = r.database.Connection.QueryRow(ctx,
 		`select when case count(*) > 0 than false else true from thegame.users where username = $1`, username).Scan(&isUserExists, &password)
 	return isUserExists, password, err
 
 }
 
-func (r *AuthRepo) CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error {
+func (r *authDatabaseRepository) CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error {
 	id := uuid.New()
 	_, err := r.database.Connection.Exec(ctx, `
 		insert into thegame.users 
@@ -47,7 +53,7 @@ func (r *AuthRepo) CreateUser(ctx context.Context, RegisterReq *RegisterReq, has
 	return err
 }
 
-func (r *AuthRepo) GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error) {
+func (r *authDatabaseRepository) GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error) {
 	err = r.database.Connection.QueryRow(ctx, `
 		select user_uuid, password from thegame.users where username = $1`, username).Scan(&user.Id, &user.Password)
 	if err == pgx.ErrNoRows {
