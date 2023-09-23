@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"os"
-	"the-game-backend/modules/auth"
+	"the-game-backend/internal/auth"
 	"the-game-backend/storage/postgres"
 
 	jwtware "github.com/gofiber/contrib/jwt"
@@ -26,7 +26,11 @@ func main() {
 
 	app := fiber.New()
 
-	auth.RegisterRouters(app, database)
+	auth.RegisterRouters(app,
+		auth.NewAuthService(
+			auth.NewAuthDatabaseRepository(database),
+		),
+	)
 
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{Key: []byte(os.Getenv("JWT_SECRET"))},
