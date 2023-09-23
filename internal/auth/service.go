@@ -8,7 +8,7 @@ import (
 
 type AuthService interface {
 	register(ctx context.Context, RegisterReq *RegisterReq) error
-	login(ctx context.Context, LoginReq *LoginReq) error
+	login(ctx context.Context, LoginReq *LoginReq) (user User, err error)
 }
 
 type authService struct {
@@ -58,7 +58,20 @@ func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) err
 	return nil
 }
 
-func (a authService) login(ctx context.Context, LoginReq *LoginReq) error {
-	// TODO
-	return nil
+func (a authService) login(ctx context.Context, LoginReq *LoginReq) (user User, err error) {
+
+	isUserExists, user, err := a.repository.GetUser(ctx, LoginReq.Username)
+	if err != nil {
+		log.Println("auth -> service.go -> GetUser -> Error while getting user, ", err)
+		return user, ErrInternalServer
+	}
+	if !isUserExists {
+		return user, ErrUnauthoerized
+	}
+
+	if !CheckPasswordHash(LoginReq.Password, user.Password) {
+		return user, ErrUnauthoerized
+	}
+
+	return user, nil
 }
