@@ -43,7 +43,7 @@ func (a *AuthenticationFiber) Register(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.SendStatus(fiber.StatusCreated)
 }
 
 func (a AuthenticationFiber) Login(c *fiber.Ctx) error {
