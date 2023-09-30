@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/mcagricaliskan/chetty/storage/postgres"
 )
@@ -36,12 +35,11 @@ func (r *authDatabaseRepository) IsUserExists(ctx context.Context, userName stri
 }
 
 func (r *authDatabaseRepository) CreateUser(ctx context.Context, userName string, displayName string, email string, hashedPassword string) error {
-	id := uuid.New()
 	_, err := r.database.Connection.Exec(ctx, `
 		insert into chetty.users
 		(user_name, display_name, password, email, created_at)
 		values ($1, $2, $3, $4, now())`,
-		id.String(), userName, displayName, hashedPassword, email)
+		userName, displayName, hashedPassword, email)
 	return err
 }
 
