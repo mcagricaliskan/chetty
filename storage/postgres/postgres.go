@@ -13,11 +13,11 @@ type Postgres struct {
 	Connection *pgxpool.Pool
 }
 
-func Connect() (*Postgres, error) {
+func Connect(databaseUrl string) (*Postgres, error) {
 	var err error
 
 	Postgres := &Postgres{}
-	Postgres.Connection, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+	Postgres.Connection, err = pgxpool.New(context.Background(), databaseUrl)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
