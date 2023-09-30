@@ -17,7 +17,12 @@ func main() {
 		godotenv.Load()
 	}
 
-	database, err := postgres.Connect()
+	databaseUrl, ok := os.LookupEnv("DATABASE_URL")
+	if !ok {
+		log.Fatal("Database URL Not Found")
+	}
+
+	database, err := postgres.Connect(databaseUrl)
 	if err != nil {
 		log.Fatal("Database Connection Can't Estabilished, Error:", err)
 	} else {
@@ -27,7 +32,7 @@ func main() {
 	app := fiber.New()
 
 	auth.RegisterRouters(app,
-		auth.NewAuthService(
+		*auth.NewAuthService(
 			auth.NewAuthDatabaseRepository(database),
 		),
 	)
