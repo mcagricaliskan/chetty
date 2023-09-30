@@ -2,10 +2,10 @@ package auth
 
 import (
 	"context"
-	"the-game-backend/storage/postgres"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/mcagricaliskan/chetty/storage/postgres"
 )
 
 type AuthDatabaseRepository interface {

@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 	"os"
-	"the-game-backend/internal/auth"
-	"the-game-backend/storage/postgres"
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/mcagricaliskan/chetty/internal/auth"
+	"github.com/mcagricaliskan/chetty/storage/postgres"
 )
 
 func main() {
