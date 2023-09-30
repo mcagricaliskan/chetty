@@ -31,7 +31,7 @@ func (r *authDatabaseRepository) IsUserExists(ctx context.Context, username stri
 				when count(*) = 1 then true
 				else false
 			end
-		from thegame.users u where u.username = $1`,
+		from chetty.users u where u.username = $1`,
 		username).Scan(&isUserExists)
 	return isUserExists, err
 }
@@ -46,7 +46,7 @@ func (r *authDatabaseRepository) GetUserPassword(ctx context.Context, username s
 func (r *authDatabaseRepository) CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string) error {
 	id := uuid.New()
 	_, err := r.database.Connection.Exec(ctx, `
-		insert into thegame.users 
+		insert into chetty.users 
 		(username, password, email, created_at) 
 		values ($1, $2, $3, $4, $5, $6, now())`,
 		id.String(), RegisterReq.Username, hashedPassword, RegisterReq.EMail)
@@ -55,7 +55,7 @@ func (r *authDatabaseRepository) CreateUser(ctx context.Context, RegisterReq *Re
 
 func (r *authDatabaseRepository) GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error) {
 	err = r.database.Connection.QueryRow(ctx, `
-		select user_id, password from thegame.users where username = $1`, username).Scan(&user.Id, &user.Password)
+		select user_id, password from chetty.users where username = $1`, username).Scan(&user.Id, &user.Password)
 	if err == pgx.ErrNoRows {
 		return false, user, nil
 	}
