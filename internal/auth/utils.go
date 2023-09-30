@@ -9,16 +9,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// HashPassword hashes the provided string.
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes), err
 }
 
+// CheckPasswordHash checks if the provided string is the same as the hashed string.
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
+// ValidatePassword checks if the provided string is a valid password.
 func validatePassword(password string) error {
 	const minPasswordLength = 8
 	if len(password) < minPasswordLength {
