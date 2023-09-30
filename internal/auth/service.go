@@ -24,7 +24,7 @@ func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) err
 	// i can move here to redis if user nubmer grows
 	isUserExists, err := a.repository.IsUserExists(ctx, RegisterReq.UserName, RegisterReq.EMail)
 	if err != nil {
-		log.Println("auth -> Register -> IsUserExists -> Error while checking user exists, ", err)
+		log.Println("auth -> service -> register -> IsUserExists -> Error while checking user exists, ", err)
 		return ErrInternalServer
 	}
 	if isUserExists {
@@ -33,13 +33,13 @@ func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) err
 
 	hashedPassword, err := HashPassword(RegisterReq.Password)
 	if err != nil {
-		log.Println("auth -> Register -> HashPassword -> Error while hashing password, ", err)
+		log.Println("auth -> service -> register -> HashPassword -> Error while hashing password, ", err)
 		return ErrInternalServer
 	}
 
 	err = a.repository.CreateUser(ctx, RegisterReq.UserName, RegisterReq.DisplayName, RegisterReq.EMail, hashedPassword)
 	if err != nil {
-		log.Println("auth -> Register -> CreateUser -> Error while creating user, ", err)
+		log.Println("auth -> service -> register -> CreateUser -> Error while creating user, ", err)
 		return ErrInternalServer
 	}
 
