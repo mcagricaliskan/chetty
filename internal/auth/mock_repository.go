@@ -1,10 +1,5 @@
 package auth
 
-import (
-	"context"
-	"errors"
-)
-
 // MockRepository is a mock implementation of the Repository interface.
 type MockRepository struct {
 	// Users is a map of user IDs to users.
@@ -18,13 +13,12 @@ func NewMockRepository() *MockRepository {
 	}
 }
 
-// GetUserByID returns a user by ID.
-func (r *MockRepository) GetUserByID(ctx context.Context, id string) (*User, error) {
-	if user, ok := r.Users[id]; ok {
-		return user, nil
+// IsUserExists returns true if the user exists.
+func (r *MockRepository) IsUserExists(userName string, userEmail string) (isUserExists bool, err error) {
+	for _, user := range r.Users {
+		if user.UserName == userName || user.Email == userEmail {
+			return true, nil
+		}
 	}
-
-	return nil, errors.New("user not found")
+	return false, nil
 }
-
-//

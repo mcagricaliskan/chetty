@@ -9,10 +9,9 @@ import (
 )
 
 type AuthDatabaseRepository interface {
-	IsUserExists(ctx context.Context, username string) (isUserExists bool, err error)
-	GetUserPassword(ctx context.Context, username string) (isUserExists bool, password string, err error)
-	CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string) error
-	GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error)
+	IsUserExists(ctx context.Context, userName string, userEmail string) (isUserExists bool, err error)
+	CreateUser(ctx context.Context, userName string, displayName string, email string, hashedPassword string) error
+	GetUser(ctx context.Context, username string) (isUserExists bool, userId int, userPassword string, err error)
 }
 
 type authDatabaseRepository struct {
@@ -25,40 +24,33 @@ func NewAuthDatabaseRepository(database *postgres.Postgres) AuthDatabaseReposito
 	}
 }
 
-func (r *authDatabaseRepository) IsUserExists(ctx context.Context, username string) (isUserExists bool, err error) {
+func (r *authDatabaseRepository) IsUserExists(ctx context.Context, userName string, userEmail string) (isUserExists bool, err error) {
 	err = r.database.Connection.QueryRow(ctx, `select 
 			case 
 				when count(*) = 1 then true
 				else false
 			end
-		from chetty.users u where u.username = $1`,
-		username).Scan(&isUserExists)
+		from chetty.users u where u.user_name = $1 or u.email = $2`,
+		userName, userEmail).Scan(&isUserExists)
 	return isUserExists, err
 }
 
-func (r *authDatabaseRepository) GetUserPassword(ctx context.Context, username string) (isUserExists bool, password string, err error) {
-	err = r.database.Connection.QueryRow(ctx,
-		`select when case count(*) > 0 than false else true from chetty.users where username = $1`, username).Scan(&isUserExists, &password)
-	return isUserExists, password, err
-
-}
-
-func (r *authDatabaseRepository) CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string) error {
+func (r *authDatabaseRepository) CreateUser(ctx context.Context, userName string, displayName string, email string, hashedPassword string) error {
 	id := uuid.New()
 	_, err := r.database.Connection.Exec(ctx, `
-		insert into chetty.users 
-		(username, password, email, created_at) 
-		values ($1, $2, $3, $4, $5, $6, now())`,
-		id.String(), RegisterReq.Username, hashedPassword, RegisterReq.EMail)
+		insert into chetty.users
+		(user_name, display_name, password, email, created_at)
+		values ($1, $2, $3, $4, now())`,
+		id.String(), userName, displayName, hashedPassword, email)
 	return err
 }
 
-func (r *authDatabaseRepository) GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error) {
+func (r *authDatabaseRepository) GetUser(ctx context.Context, username string) (isUserExists bool, userId int, userPassword string, err error) {
 	err = r.database.Connection.QueryRow(ctx, `
-		select user_id, password from chetty.users where username = $1`, username).Scan(&user.Id, &user.Password)
+		select user_id, display_name, password from chetty.users where username = $1`, username).Scan(&userId, &userPassword)
 	if err == pgx.ErrNoRows {
-		return false, user, nil
+		return false, userId, userPassword, nil
 	}
 	isUserExists = true
-	return isUserExists, user, err
+	return isUserExists, userId, userPassword, err
 }

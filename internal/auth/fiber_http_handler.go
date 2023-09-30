@@ -53,7 +53,7 @@ func (a AuthenticationFiber) Login(c *fiber.Ctx) error {
 		return c.Status(422).JSON(err)
 	}
 
-	user, err := a.service.login(c.Context(), &login)
+	userId, err := a.service.login(c.Context(), &login)
 	if err != nil {
 		switch err {
 		case ErrInternalServer:
@@ -66,7 +66,7 @@ func (a AuthenticationFiber) Login(c *fiber.Ctx) error {
 	}
 	// Create the Claims
 	claims := jwt.MapClaims{
-		"id":  user.Id,
+		"id":  userId,
 		"exp": time.Now().Add(time.Hour * 72).Unix(),
 	}
 

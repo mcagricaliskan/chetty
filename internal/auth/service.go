@@ -7,7 +7,7 @@ import (
 
 type AuthService interface {
 	register(ctx context.Context, RegisterReq *RegisterReq) error
-	login(ctx context.Context, LoginReq *LoginReq) (user User, err error)
+	login(ctx context.Context, LoginReq *LoginReq) (userId int, err error)
 }
 
 type authService struct {
@@ -22,7 +22,7 @@ func NewAuthService(repository AuthDatabaseRepository) AuthService {
 
 func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) error {
 	// i can move here to redis if user nubmer grows
-	isUserExists, err := a.repository.IsUserExists(ctx, RegisterReq.Username)
+	isUserExists, err := a.repository.IsUserExists(ctx, RegisterReq.UserName, RegisterReq.EMail)
 	if err != nil {
 		log.Println("auth -> Register -> IsUserExists -> Error while checking user exists, ", err)
 		return ErrInternalServer
@@ -37,7 +37,7 @@ func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) err
 		return ErrInternalServer
 	}
 
-	err = a.repository.CreateUser(ctx, RegisterReq, hashedPassword)
+	err = a.repository.CreateUser(ctx, RegisterReq.UserName, RegisterReq.DisplayName, RegisterReq.EMail, hashedPassword)
 	if err != nil {
 		log.Println("auth -> Register -> CreateUser -> Error while creating user, ", err)
 		return ErrInternalServer
@@ -46,20 +46,20 @@ func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) err
 	return nil
 }
 
-func (a authService) login(ctx context.Context, LoginReq *LoginReq) (user User, err error) {
+func (a authService) login(ctx context.Context, LoginReq *LoginReq) (userId int, err error) {
 
-	isUserExists, user, err := a.repository.GetUser(ctx, LoginReq.Username)
+	isUserExists, userId, userPassword, err := a.repository.GetUser(ctx, LoginReq.Username)
 	if err != nil {
 		log.Println("auth -> service.go -> GetUser -> Error while getting user, ", err)
-		return user, ErrInternalServer
+		return 0, ErrInternalServer
 	}
 	if !isUserExists {
-		return user, ErrUnauthoerized
+		return 0, ErrUnauthoerized
 	}
 
-	if !CheckPasswordHash(LoginReq.Password, user.Password) {
-		return user, ErrUnauthoerized
+	if !CheckPasswordHash(userPassword, userPassword) {
+		return 0, ErrUnauthoerized
 	}
 
-	return user, nil
+	return userId, nil
 }
