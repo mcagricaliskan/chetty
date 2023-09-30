@@ -1,12 +1,9 @@
 package auth
 
 type RegisterReq struct {
-	Username        string `json:"username"`
-	Password        string `json:"password"`
-	EMail           string `json:"email"`
-	Gender          string `json:"gender"`
-	CharacterGender string `json:"character_gender"`
-	BirthDate       string `json:"birth_date"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	EMail    string `json:"email"`
 }
 
 type LoginReq struct {

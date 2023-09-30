@@ -37,18 +37,7 @@ func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) err
 		return ErrInternalServer
 	}
 
-	genderId, err := getGenderId(RegisterReq.Gender)
-	if err != nil {
-		log.Println("auth -> Register -> getGenderId -> Error while getting gender id, ", err)
-		return ErrBadRequest
-	}
-
-	characterGenderId, err := getCharacterGenderId(RegisterReq.CharacterGender)
-	if err != nil {
-		return ErrBadRequest
-	}
-
-	err = a.repository.CreateUser(ctx, RegisterReq, hashedPassword, genderId, characterGenderId)
+	err = a.repository.CreateUser(ctx, RegisterReq, hashedPassword)
 	if err != nil {
 		log.Println("auth -> Register -> CreateUser -> Error while creating user, ", err)
 		return ErrInternalServer

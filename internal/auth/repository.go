@@ -11,7 +11,7 @@ import (
 type AuthDatabaseRepository interface {
 	IsUserExists(ctx context.Context, username string) (isUserExists bool, err error)
 	GetUserPassword(ctx context.Context, username string) (isUserExists bool, password string, err error)
-	CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error
+	CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string) error
 	GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error)
 }
 
@@ -38,24 +38,24 @@ func (r *authDatabaseRepository) IsUserExists(ctx context.Context, username stri
 
 func (r *authDatabaseRepository) GetUserPassword(ctx context.Context, username string) (isUserExists bool, password string, err error) {
 	err = r.database.Connection.QueryRow(ctx,
-		`select when case count(*) > 0 than false else true from thegame.users where username = $1`, username).Scan(&isUserExists, &password)
+		`select when case count(*) > 0 than false else true from chetty.users where username = $1`, username).Scan(&isUserExists, &password)
 	return isUserExists, password, err
 
 }
 
-func (r *authDatabaseRepository) CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string, genderId int, characterGenderId int) error {
+func (r *authDatabaseRepository) CreateUser(ctx context.Context, RegisterReq *RegisterReq, hashedPassword string) error {
 	id := uuid.New()
 	_, err := r.database.Connection.Exec(ctx, `
 		insert into thegame.users 
-		(user_uuid, username, password, email, birth_date, gender_id, character_gender_id, created_at) 
-		values ($1, $2, $3, $4, $5, $6, $7, now())`,
-		id.String(), RegisterReq.Username, hashedPassword, RegisterReq.EMail, RegisterReq.BirthDate, genderId, characterGenderId)
+		(username, password, email, created_at) 
+		values ($1, $2, $3, $4, $5, $6, now())`,
+		id.String(), RegisterReq.Username, hashedPassword, RegisterReq.EMail)
 	return err
 }
 
 func (r *authDatabaseRepository) GetUser(ctx context.Context, username string) (isUserExists bool, user User, err error) {
 	err = r.database.Connection.QueryRow(ctx, `
-		select user_uuid, password from thegame.users where username = $1`, username).Scan(&user.Id, &user.Password)
+		select user_id, password from thegame.users where username = $1`, username).Scan(&user.Id, &user.Password)
 	if err == pgx.ErrNoRows {
 		return false, user, nil
 	}

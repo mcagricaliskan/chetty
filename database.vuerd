@@ -3,8 +3,8 @@
     "version": "2.2.11",
     "width": 10000,
     "height": 10000,
-    "scrollTop": -176.39999948501588,
-    "scrollLeft": -599.6000000858301,
+    "scrollTop": -151.19999831199658,
+    "scrollLeft": -510.7999961090079,
     "zoomLevel": 1,
     "show": {
       "tableComment": true,
@@ -139,75 +139,6 @@
             "id": "bf806c66-b50f-41f0-84f4-3e8026e79e56"
           },
           {
-            "name": "birth_date",
-            "comment": "",
-            "dataType": "date",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": false,
-              "pfk": false,
-              "widthName": 60,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "c93b1721-a5fa-4d98-9282-111911f8311c"
-          },
-          {
-            "name": "gender_id",
-            "comment": "",
-            "dataType": "smallint",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": true,
-              "pfk": false,
-              "widthName": 60,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "90a8887d-eaec-4320-a0cd-1eb4b8e01e88"
-          },
-          {
-            "name": "character_gender_id",
-            "comment": "",
-            "dataType": "smallint",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": true,
-              "pfk": false,
-              "widthName": 121.2470703125,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "fcfc99d0-9f42-46a3-b0d9-6007810786c4"
-          },
-          {
             "name": "created_at",
             "comment": "",
             "dataType": "timestamp",
@@ -235,136 +166,12 @@
           "active": false,
           "left": 634,
           "top": 393,
-          "zIndex": 6,
+          "zIndex": 3,
           "widthName": 60,
           "widthComment": 60
         },
         "visible": true,
         "id": "0d678d55-8463-44d6-9dee-e83fcfa9cd63"
-      },
-      {
-        "name": "genders",
-        "comment": "",
-        "columns": [
-          {
-            "name": "gender_id",
-            "comment": "",
-            "dataType": "smallint",
-            "default": "",
-            "option": {
-              "autoIncrement": true,
-              "primaryKey": true,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": true,
-              "fk": false,
-              "pfk": false,
-              "widthName": 60,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "cd8a9fe2-7a2c-4191-86d6-82ab532cfd62"
-          },
-          {
-            "name": "gender",
-            "comment": "",
-            "dataType": "text",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": false,
-              "pfk": false,
-              "widthName": 60,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "be8591e1-d581-4c2a-96d3-6d02f31a3ad8"
-          }
-        ],
-        "ui": {
-          "active": false,
-          "left": 1220,
-          "top": 330,
-          "zIndex": 2,
-          "widthName": 60,
-          "widthComment": 60
-        },
-        "visible": true,
-        "id": "34c56559-ccd4-4198-872f-7fb691f52e97"
-      },
-      {
-        "name": "character_genders",
-        "comment": "",
-        "columns": [
-          {
-            "name": "character_gender_id",
-            "comment": "",
-            "dataType": "smallint",
-            "default": "",
-            "option": {
-              "autoIncrement": true,
-              "primaryKey": true,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": true,
-              "fk": false,
-              "pfk": false,
-              "widthName": 121.2470703125,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "aa025964-94a6-451e-b7e2-09badc217f5a"
-          },
-          {
-            "name": "gender",
-            "comment": "",
-            "dataType": "text",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": false,
-              "pfk": false,
-              "widthName": 60,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "0d841d72-b432-4404-9d1e-a3d33dfe7f9f"
-          }
-        ],
-        "ui": {
-          "active": false,
-          "left": 1218,
-          "top": 461,
-          "zIndex": 1,
-          "widthName": 110.39892578125,
-          "widthComment": 60
-        },
-        "visible": true,
-        "id": "f5e87f0f-ef4d-4641-85bc-d0b2dd2de763"
       }
     ],
     "indexes": []
@@ -373,59 +180,6 @@
     "memos": []
   },
   "relationship": {
-    "relationships": [
-      {
-        "identification": false,
-        "relationshipType": "OneN",
-        "startRelationshipType": "Dash",
-        "start": {
-          "tableId": "34c56559-ccd4-4198-872f-7fb691f52e97",
-          "columnIds": [
-            "cd8a9fe2-7a2c-4191-86d6-82ab532cfd62"
-          ],
-          "x": 1220,
-          "y": 385,
-          "direction": "left"
-        },
-        "end": {
-          "tableId": "0d678d55-8463-44d6-9dee-e83fcfa9cd63",
-          "columnIds": [
-            "90a8887d-eaec-4320-a0cd-1eb4b8e01e88"
-          ],
-          "x": 1091.20703125,
-          "y": 567.75,
-          "direction": "right"
-        },
-        "constraintName": "fk_genders_to_users",
-        "visible": true,
-        "id": "4dbbbba3-1259-4334-a2e3-b672c70231e5"
-      },
-      {
-        "identification": false,
-        "relationshipType": "OneN",
-        "startRelationshipType": "Dash",
-        "start": {
-          "tableId": "f5e87f0f-ef4d-4641-85bc-d0b2dd2de763",
-          "columnIds": [
-            "aa025964-94a6-451e-b7e2-09badc217f5a"
-          ],
-          "x": 1218,
-          "y": 516,
-          "direction": "left"
-        },
-        "end": {
-          "tableId": "0d678d55-8463-44d6-9dee-e83fcfa9cd63",
-          "columnIds": [
-            "fcfc99d0-9f42-46a3-b0d9-6007810786c4"
-          ],
-          "x": 1091.20703125,
-          "y": 451.25,
-          "direction": "right"
-        },
-        "constraintName": "fk_character_genders_to_users",
-        "visible": true,
-        "id": "69e11615-675e-4ffc-b744-9b68bb604fe3"
-      }
-    ]
+    "relationships": []
   }
 }
