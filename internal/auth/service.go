@@ -29,7 +29,7 @@ func (a *authService) register(ctx context.Context, RegisterReq *RegisterReq) er
 
 	err := validatePassword(RegisterReq.Password)
 	if err != nil {
-		return err
+		return ErrInvalidPassword
 	}
 	// if !validateUserName(RegisterReq.UserName) {
 	// 	return errInvalidUserName

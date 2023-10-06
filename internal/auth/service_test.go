@@ -85,6 +85,56 @@ func Test_register(t *testing.T) {
 			},
 			resp: ErrUserExists,
 		},
+		{
+			name: "InvalidPasswordNotNumber",
+			req: &RegisterReq{
+				UserName:    "mcagricaliskan_test",
+				DisplayName: "Mehmet Çağrı Çalışkan",
+				Password:    "mpyF{qTHwk{pK!ff",
+				EMail:       "mcagricaliskan_test@gmail.com",
+			},
+			resp: ErrInvalidPassword,
+		},
+		{
+			name: "InvalidPasswordNotSpecialChar",
+			req: &RegisterReq{
+				UserName:    "mcagricaliskan_test",
+				DisplayName: "Mehmet Çağrı Çalışkan",
+				Password:    "mpyF0q4THwkp9dKff",
+				EMail:       "mcagricaliskan_test@gmail.com",
+			},
+			resp: ErrInvalidPassword,
+		},
+		{
+			name: "InvalidPasswordNotCapitalLetter",
+			req: &RegisterReq{
+				UserName:    "mcagricaliskan_test",
+				DisplayName: "Mehmet Çağrı Çalışkan",
+				Password:    "mpyf{0q4thwk{p9dk!ff",
+				EMail:       "mcagricaliskan_test@gmail.com",
+			},
+			resp: ErrInvalidPassword,
+		},
+		{
+			name: "InvalidPasswordNotSmallLetter",
+			req: &RegisterReq{
+				UserName:    "mcagricaliskan_test",
+				DisplayName: "Mehmet Çağrı Çalışkan",
+				Password:    "MPYF{0Q4THWK{P9DK!FF",
+				EMail:       "mcagricaliskan_test@gmail.com",
+			},
+			resp: ErrInvalidPassword,
+		},
+		{
+			name: "InvalidPasswordNotLength",
+			req: &RegisterReq{
+				UserName:    "mcagricaliskan_test",
+				DisplayName: "Mehmet Çağrı Çalışkan",
+				Password:    "hTM!+n1",
+				EMail:       "mcagricaliskan_test@gmail.com",
+			},
+			resp: ErrInvalidPassword,
+		},
 	}
 
 	authDatabaseRepository := NewAuthDatabaseRepository(database)
