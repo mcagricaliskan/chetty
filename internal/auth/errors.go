@@ -3,8 +3,9 @@ package auth
 import "errors"
 
 var (
-	ErrUnauthoerized  = errors.New("Unauthorized")
-	ErrInternalServer = errors.New("Internal Server Error")
-	ErrUserExists     = errors.New("User Already Exists")
-	ErrBadRequest     = errors.New("Bad Request")
+	ErrUnauthorized    = errors.New("unauthorized")
+	ErrInternalServer  = errors.New("internal server error")
+	ErrUserExists      = errors.New("user already exists")
+	ErrBadRequest      = errors.New("bad request")
+	ErrInvalidPassword = errors.New("invalid password")
 )

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"log"
 	"os"
 	"time"
@@ -9,12 +10,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type AuthenticationFiber struct {
-	service AuthService
+type AuthenticationHandler struct {
+	service authService
 }
 
-func RegisterRouters(app *fiber.App, service AuthService) {
-	a := AuthenticationFiber{
+func RegisterRouters(app *fiber.App, service authService) {
+	a := AuthenticationHandler{
 		service: service,
 	}
 
@@ -22,7 +23,7 @@ func RegisterRouters(app *fiber.App, service AuthService) {
 	app.Post("/login", a.Login)
 }
 
-func (a *AuthenticationFiber) Register(c *fiber.Ctx) error {
+func (a *AuthenticationHandler) Register(c *fiber.Ctx) error {
 
 	user := RegisterReq{}
 	if err := c.BodyParser(&user); err != nil {
@@ -31,12 +32,14 @@ func (a *AuthenticationFiber) Register(c *fiber.Ctx) error {
 
 	err := a.service.register(c.Context(), &user)
 	if err != nil {
-		switch err {
-		case ErrInternalServer:
+		switch {
+		case errors.Is(err, ErrInvalidPassword):
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Invalid Password"})
+		case errors.Is(err, ErrInternalServer):
 			return c.SendStatus(fiber.StatusInternalServerError)
-		case ErrUserExists:
+		case errors.Is(err, ErrUserExists):
 			return c.SendStatus(fiber.StatusConflict)
-		case ErrBadRequest:
+		case errors.Is(err, ErrBadRequest):
 			return c.SendStatus(fiber.StatusBadRequest)
 		default:
 			return c.SendStatus(fiber.StatusInternalServerError)
@@ -46,7 +49,7 @@ func (a *AuthenticationFiber) Register(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusCreated)
 }
 
-func (a AuthenticationFiber) Login(c *fiber.Ctx) error {
+func (a AuthenticationHandler) Login(c *fiber.Ctx) error {
 
 	login := LoginReq{}
 	if err := c.BodyParser(&login); err != nil {
@@ -58,12 +61,13 @@ func (a AuthenticationFiber) Login(c *fiber.Ctx) error {
 		switch err {
 		case ErrInternalServer:
 			return c.SendStatus(fiber.StatusInternalServerError)
-		case ErrUnauthoerized:
+		case ErrUnauthorized:
 			return c.SendStatus(fiber.StatusUnauthorized)
 		default:
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 	}
+
 	// Create the Claims
 	claims := jwt.MapClaims{
 		"id":  userId,

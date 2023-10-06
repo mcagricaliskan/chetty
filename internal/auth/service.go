@@ -2,29 +2,47 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"log"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthService interface {
-	register(ctx context.Context, RegisterReq *RegisterReq) error
-	login(ctx context.Context, LoginReq *LoginReq) (userId int, err error)
+// TODO:  bir kere kullanıyoruz zaten burayı service içerisine koyabiliriz
+// HashPassword hashes the provided string.
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
 }
 
 type authService struct {
 	repository AuthDatabaseRepository
 }
 
-func NewAuthService(repository AuthDatabaseRepository) AuthService {
+func NewAuthService(repository AuthDatabaseRepository) *authService {
 	return &authService{
 		repository: repository,
 	}
 }
 
-func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) error {
+func (a *authService) register(ctx context.Context, RegisterReq *RegisterReq) error {
+
+	err := validatePassword(RegisterReq.Password)
+	if err != nil {
+		return err
+	}
+	// if !validateUserName(RegisterReq.UserName) {
+	// 	return errInvalidUserName
+	// }
+	// if !validateDisplayName(RegisterReq.DisplayName) {
+	// 	return errInvalidDisplayName
+	// }
+
 	// i can move here to redis if user nubmer grows
 	isUserExists, err := a.repository.IsUserExists(ctx, RegisterReq.UserName, RegisterReq.EMail)
 	if err != nil {
 		log.Println("auth -> service -> register -> IsUserExists -> Error while checking user exists, ", err)
+		// return fmt.Errorf("%T.CreateUser(): %w", ErrInternalServer)
 		return ErrInternalServer
 	}
 	if isUserExists {
@@ -39,14 +57,14 @@ func (a authService) register(ctx context.Context, RegisterReq *RegisterReq) err
 
 	err = a.repository.CreateUser(ctx, RegisterReq.UserName, RegisterReq.DisplayName, RegisterReq.EMail, hashedPassword)
 	if err != nil {
-		log.Println("auth -> service -> register -> CreateUser -> Error while creating user, ", err)
+		log.Println("auth -> service -> register -> CreateUser -> Error while creating user: ", err)
 		return ErrInternalServer
 	}
 
 	return nil
 }
 
-func (a authService) login(ctx context.Context, LoginReq *LoginReq) (userId int, err error) {
+func (a *authService) login(ctx context.Context, LoginReq *LoginReq) (userId int, err error) {
 
 	isUserExists, userId, userPassword, err := a.repository.GetUser(ctx, LoginReq.Username)
 	if err != nil {
@@ -54,12 +72,18 @@ func (a authService) login(ctx context.Context, LoginReq *LoginReq) (userId int,
 		return 0, ErrInternalServer
 	}
 	if !isUserExists {
-		return 0, ErrUnauthoerized
+		return 0, ErrUnauthorized
 	}
 
-	if !CheckPasswordHash(userPassword, userPassword) {
-		return 0, ErrUnauthoerized
+	err = bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(LoginReq.Password))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return 0, ErrUnauthorized
+		}
+		return 0, ErrInternalServer
 	}
 
 	return userId, nil
 }
+
+//
